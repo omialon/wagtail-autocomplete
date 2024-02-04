@@ -29,7 +29,7 @@ describe('Suggestions', () => {
     expect(suggestions).toMatchSnapshot();
   });
 
-  it('does not show create new if input value is blank', () => {
+  it('does not show créer un nouveau if input value is blank', () => {
     const suggestions = shallow(
       <Suggestions
         {...mockProps}
@@ -40,12 +40,12 @@ describe('Suggestions', () => {
 
     const item = suggestions.findWhere(node => (
       node.type() === 'li' &&
-      node.text().startsWith('Create new')
+      node.text().startsWith('Créer un nouveau')
     ));
     expect(item.exists()).toEqual(false);
   });
 
-  it('does show create new if input value is not blank', () => {
+  it('does show créer un nouveau if input value is not blank', () => {
     const suggestions = shallow(
       <Suggestions
         {...mockProps}
@@ -56,7 +56,7 @@ describe('Suggestions', () => {
 
     const item = suggestions.findWhere(node => (
       node.type() === 'li' &&
-      node.text().startsWith('Create new') &&
+      node.text().startsWith('Créer un nouveau') &&
       node.text().includes('new item')
     ));
     expect(item.exists()).toEqual(true);

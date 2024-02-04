@@ -266,7 +266,7 @@ class Suggestions extends PureComponent {
               )}
               id={`${this.suggestionsControlsId}-${suggestions.length}`}
             >
-              Create new “{input.value}”
+              Créer un nouveau “{input.value}”
             </li>
           )}
         </ul>

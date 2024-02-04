@@ -5,7 +5,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db.models import Model, QuerySet
-from django.http import (HttpResponseBadRequest, HttpResponseForbidden,
+from django.http import (HttpResponseForbidden,
                          HttpResponseNotFound, JsonResponse)
 from django.views.decorators.http import require_GET, require_POST
 
@@ -25,12 +25,12 @@ def render_page(page):
 def objects(request):
     pks_param = request.GET.get('pks')
     if not pks_param:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
     target_model = request.GET.get('type', 'wagtailcore.Page')
     try:
         model = apps.get_model(target_model)
     except Exception:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     try:
         pks = [
@@ -39,7 +39,7 @@ def objects(request):
         ]
         queryset = model.objects.filter(pk__in=pks)
     except Exception:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     if getattr(queryset, 'live', None):
         # Non-Page models like Snippets won't have a live/published status
@@ -59,12 +59,12 @@ def search(request):
     try:
         model = apps.get_model(target_model)
     except Exception:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     try:
         limit = int(request.POST.get('limit', 100))
     except ValueError:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     if callable(getattr(model, 'autocomplete_custom_queryset_filter', None)):
         queryset = model.autocomplete_custom_queryset_filter(search_query)
@@ -136,13 +136,13 @@ def validate_queryset(queryset: QuerySet, model: Model):
 def create(request, *args, **kwargs):
     value = request.POST.get('value', None)
     if not value:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     target_model = request.POST.get('type', 'wagtailcore.Page')
     try:
         model = apps.get_model(target_model)
     except Exception:
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     content_type = ContentType.objects.get_for_model(model)
     permission_label = '{}.add_{}'.format(
@@ -154,7 +154,7 @@ def create(request, *args, **kwargs):
 
     method = getattr(model, 'autocomplete_create', None)
     if not callable(method):
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "400"})
 
     try:
         instance = method(value)
